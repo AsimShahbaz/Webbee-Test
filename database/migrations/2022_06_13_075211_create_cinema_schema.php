@@ -36,6 +36,59 @@ class CreateCinemaSchema extends Migration
      */
     public function up()
     {
+
+        Schema::create('users', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('email')->unique();
+            $table->timestamp('email_verified_at')->nullable();
+            $table->string('password');
+            $table->enum('role', ['viewer', 'admin']);
+            $table->rememberToken();
+            $table->timestamps();
+        });
+
+        Schema::create('Cinemas', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('Location');
+            $table->timestamps();
+        });
+
+        Schema::create('films', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->timestamps();
+        });
+
+        //pivot table for movies and cenima
+
+        Schema::create('cinemaFilm', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('film_id')->constrained('films');
+            $table->foreignId('cinema_id')->constrained('Cinemas');
+            $table->dateTime('showTime');
+            $table->timestamps();
+        });
+
+        Schema::create('seats', function (Blueprint $table) {
+            $table->id();
+            $table->int('seatNo')->constrained('films');
+            $table->enum('category', ['vip', 'super', 'vip-couple']);
+            $table->foreignId('cinema_id')->constrained('Cinemas');
+            $table->enum('status', ['available', 'reserve']);
+            $table->timestamps();
+        });
+
+        Schema::create('booking', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('show_id')->constrained('cinemaFilm');
+            $table->foreignId('seat_id')->constrained('seats');
+            $table->foreignId('viewer_id')->constrained('user');
+
+            $table->timestamps();
+        });
+
         throw new \Exception('implement in coding task 4, you can ignore this exception if you are just running the initial migrations.');
     }
 
